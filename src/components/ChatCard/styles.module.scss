@@ -1,0 +1,18 @@
+@import '../../assets/variables/colors';
+
+.chatCard {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: $white;
+}
+
+.chatName {
+  font-weight: 500;
+  margin-bottom: 0.5rem !important;
+}
+
+.lastMessage {
+  color: $textSecondary;
+  width: 100%;
+}
