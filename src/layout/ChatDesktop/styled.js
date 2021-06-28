@@ -29,5 +29,7 @@ export const StyledHeader = styled((props) => <Header aria-label='styled-ant-hea
 export const StyledContent = styled((props) => (
   <Content aria-label='styled-ant-content' {...props} />
 ))`
+  display: flex;
+  flex-direction: column;
   background-color: ${colors.white};
 `;

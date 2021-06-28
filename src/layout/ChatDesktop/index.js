@@ -14,12 +14,6 @@ export function ChatDesktop() {
       <StyledSider>
         <Typography.Title level={3}>Chats</Typography.Title>
         <Input.Search placeholder='Tìm kiếm người dùng hoặc nhóm...' size='middle' />
-        {/* <div className={styles.listOnlineVertically}>
-          <AvatarChat />
-          <AvatarChat />
-          <AvatarChat />
-          <AvatarChat />
-        </div> */}
         <Row>
           <Col span={24}>
             <ChatCard />
@@ -52,7 +46,10 @@ export function ChatDesktop() {
             </Col>
           </Row>
         </StyledHeader>
-        <StyledContent></StyledContent>
+        <StyledContent>
+          <div key='list-of-messages' aria-label='list-of-messages'></div>
+          <div key='chat-input' aria-label='chat-input'></div>
+        </StyledContent>
       </Layout>
     </Layout>
   );
