@@ -1,0 +1,16 @@
+@import '../../../assets/variables/colors';
+
+.baseInput {
+  display: block;
+  padding: 0.5rem;
+
+  background: $gray;
+  border: none;
+  border-radius: 4px;
+
+  outline: none;
+}
+
+.fullWidth {
+  width: 100%;
+}
