@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { colors } from '../../assets/variables/colors';
 
 const { Sider, Header, Content } = Layout;
-const siderWidth = '340px';
+const siderWidth = '480px';
 
 export const StyledSider = styled((props) => <Sider aria-label='styled-ant-sider' {...props} />)`
   position: sticky;
@@ -32,4 +32,5 @@ export const StyledContent = styled((props) => (
   display: flex;
   flex-direction: column;
   background-color: ${colors.white};
+  height: 100%;
 `;

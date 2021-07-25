@@ -1,0 +1,40 @@
+@import '/src/assets/variables/colors';
+
+.listOfMessages {
+  flex-grow: 1;
+}
+
+.chatInput {
+  padding: 1rem;
+  display: flex;
+  width: 100%;
+  margin: 0 !important;
+
+  background-color: white;
+}
+
+.divider {
+  margin: 0 !important;
+}
+
+.header {
+  height: 80px;
+  background-color: $white !important;
+  border-bottom: 1px solid $grayLighter !important;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  background-color: $white;
+  height: 100%;
+}
+
+.resetLineHeight {
+  line-height: 0;
+}
+
+.chatName {
+  font-weight: 500;
+  margin-bottom: 1.5rem !important;
+}
