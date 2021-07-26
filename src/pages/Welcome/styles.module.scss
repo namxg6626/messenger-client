@@ -1,0 +1,34 @@
+@import '/src/assets/variables/colors';
+
+.thisScreen {
+  padding: 3rem;
+}
+
+.avatar {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+
+  height: 120px !important;
+  width: 120px !important;
+
+  background-color: $blueExtraDark !important;
+}
+
+.avatarString {
+  display: block;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: $blue;
+
+  transform: translateY(0.1rem) !important;
+}
+
+.welcome {
+  font-weight: 400 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.userName {
+  margin: 0 !important;
+}

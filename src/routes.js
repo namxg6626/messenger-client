@@ -1,5 +1,6 @@
 import { ChatDesktop } from './layout';
 import Chat from './pages/Chat';
+import Welcome from './pages/Welcome';
 
 const routes = [
   {
@@ -9,6 +10,10 @@ const routes = [
       {
         path: ':id',
         element: <Chat />,
+      },
+      {
+        path: '/',
+        element: <Welcome />,
       },
     ],
   },
