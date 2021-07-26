@@ -1,0 +1,11 @@
+.thisScreen {
+  display: flex;
+  height: 100vh;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.form {
+  transform: translateY(-10rem);
+}
