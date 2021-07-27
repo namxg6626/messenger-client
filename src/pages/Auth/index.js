@@ -1,14 +1,28 @@
+import { useEffect } from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { authLoginAsyncAction } from '@store/auth/auth.action';
+import { useNavigate } from 'react-router-dom';
 import styles from './styles.module.scss';
 
 export default function Auth() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+
   const onFinish = (values) => {
-    console.log('Success:', values);
+    dispatch(authLoginAsyncAction(values.username, values.password, values.remember));
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
+
+  useEffect(() => {
+    if (auth.token) {
+      navigate('messages');
+    }
+  }, [auth.token, navigate]);
 
   return (
     <div className={styles.thisScreen}>
