@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { useEffect, useState } from 'react';
+import { Form, Input, Button, Checkbox, notification } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { authLoginAsyncAction } from '@store/auth/auth.action';
+import { authClearError, authLoginAsyncAction } from '@store/auth/auth.action';
 import { useNavigate } from 'react-router-dom';
 import styles from './styles.module.scss';
 
@@ -19,10 +19,24 @@ export default function Auth() {
   };
 
   useEffect(() => {
+    let timeout = null;
     if (auth.token) {
-      navigate('messages');
+      timeout = setTimeout(() => {
+        navigate('messages');
+      }, 500); // improve UX :D
     }
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [auth.token, navigate]);
+
+  useEffect(() => {
+    if (auth.error) {
+      notification.error({ message: auth.error });
+      dispatch(authClearError());
+    }
+  }, [auth.error, dispatch]);
 
   return (
     <div className={styles.thisScreen}>
@@ -53,7 +67,7 @@ export default function Auth() {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type='primary' htmlType='submit'>
+          <Button loading={auth.isLoading} type='primary' htmlType='submit'>
             Submit
           </Button>
         </Form.Item>

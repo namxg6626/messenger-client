@@ -6,5 +6,5 @@ export const login = (username, password) =>
     axios
       .post(endpoints.authLogin, { username, password })
       .then((res) => resl(res.data))
-      .catch((e) => rej(e.response.message));
+      .catch((e) => rej(e.response.data.message));
   });

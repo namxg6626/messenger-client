@@ -8,6 +8,8 @@ const initialState = {
 };
 
 const authReducer = (state = initialState, action) => {
+  const { payload = {} } = action;
+
   switch (action.type) {
     case AuthActionsEnum.LOADING:
       return {
@@ -21,12 +23,25 @@ const authReducer = (state = initialState, action) => {
         isLoading: false,
       };
 
+    case AuthActionsEnum.FAILED:
+      return {
+        ...state,
+        error: payload.error,
+      };
+
+    case AuthActionsEnum.CLEAR_ERROR:
+      return {
+        ...state,
+        error: '',
+      };
+
     case AuthActionsEnum.LOGIN:
       return {
         ...state,
         data: action.payload.data,
         storedToken: action.payload.remember ? action.payload.data.jwt || '' : '',
         token: action.payload.data.jwt || '',
+        error: '',
       };
 
     case AuthActionsEnum.LOGOUT:
