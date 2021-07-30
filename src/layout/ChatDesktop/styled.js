@@ -11,11 +11,10 @@ export const StyledSider = styled((props) => <Sider aria-label='styled-ant-sider
   top: 0;
 
   height: 100vh;
-  padding: 1rem 2rem;
+  padding: 0rem 2rem 1rem 2rem;
   width: ${siderWidth} !important;
   min-width: ${siderWidth} !important;
   max-width: ${siderWidth} !important;
 
-  overflow: hidden;
   background-color: ${colors.grayLight};
 `;

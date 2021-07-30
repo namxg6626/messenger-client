@@ -5,7 +5,6 @@ import { BaseInput } from '@components/index';
 
 import { generateRandomColor } from 'src/utils';
 import styles from './styles.module.scss';
-import messagesMock from 'src/__mock__/messages';
 
 const { Header, Content } = Layout;
 const { Paragraph, Text } = Typography;
@@ -13,7 +12,6 @@ const { Paragraph, Text } = Typography;
 export default function Chat() {
   const params = useParams();
   console.log(`params`, params);
-  console.log(`messagesMock`, messagesMock);
 
   return (
     <>
