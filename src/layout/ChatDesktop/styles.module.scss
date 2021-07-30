@@ -1,3 +1,5 @@
+@import '/src/assets/variables/main';
+
 .resetLineHeight {
   line-height: 0;
 }
@@ -28,4 +30,23 @@
 
 .baseInput {
   background-color: white;
+}
+
+.siderScroll {
+  @include vertical-scrollbar();
+}
+
+.siderHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  padding-top: 1rem;
+
+  background-color: $grayLight;
+}
+
+.dividerVertical {
+  height: 100vh !important;
+  margin: 0 !important;
 }

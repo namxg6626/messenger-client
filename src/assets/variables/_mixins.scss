@@ -1,0 +1,30 @@
+@import 'colors';
+
+@mixin scrollbar-base {
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+    transform: translateX(-5px);
+    margin-right: 1rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: $grayDarker;
+    margin-right: 1rem;
+  }
+}
+
+@mixin vertical-scrollbar {
+  @include scrollbar-base();
+  overflow-y: scroll;
+}
+
+@mixin horizontal-scrollbar {
+  @include scrollbar-base();
+  overflow-y: scroll;
+}
+
+@mixin both-scrollbar {
+  @include scrollbar-base();
+  overflow: scroll;
+}
