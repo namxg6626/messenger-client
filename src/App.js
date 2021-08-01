@@ -14,11 +14,8 @@ function App() {
   // </Routes>
 
   const element = useRoutes(routes);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(authRestoreToken());
-  }, []);
+  console.log('object');
 
   return element;
 }

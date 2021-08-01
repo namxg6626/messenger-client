@@ -15,7 +15,7 @@ export default function Welcome() {
       <Row gutter={16} align='middle'>
         <Col>
           <Avatar size='large' className={styles.avatar}>
-            <span className={styles.avatarString}>{getShortName(data.displayname)}</span>
+            <span className={styles.avatarString}>{getShortName(data?.displayname)}</span>
           </Avatar>
         </Col>
         <Col>
@@ -23,7 +23,7 @@ export default function Welcome() {
             Welcome!
           </Title>
           <Title level={1} className={styles.userName}>
-            {data.displayname}
+            {data?.displayname}
           </Title>
         </Col>
       </Row>

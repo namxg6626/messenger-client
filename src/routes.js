@@ -1,3 +1,4 @@
+import { PrivateComponent } from './components';
 import { ChatDesktop } from './layout';
 import Auth from './pages/Auth';
 import Chat from './pages/Chat';
@@ -6,7 +7,11 @@ import Welcome from './pages/Welcome';
 const routes = [
   {
     path: 'messages',
-    element: <ChatDesktop />,
+    element: (
+      <PrivateComponent>
+        <ChatDesktop />
+      </PrivateComponent>
+    ),
     children: [
       {
         path: ':id',

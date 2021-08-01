@@ -10,8 +10,6 @@ export function ChatDesktop() {
   const navigate = useNavigate();
   const params = useParams();
 
-  console.log(`params`, params);
-
   const _renderMockConversations = () => {
     return __mock__.conversations.map((conversation) => (
       <Col span={24}>
