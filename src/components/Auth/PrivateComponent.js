@@ -1,13 +1,10 @@
 import { useEffect, memo } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { authRestoreToken } from '@store/auth/auth.action';
+import { useSelector } from 'react-redux';
 
 export const PrivateComponent = memo((props) => {
   const auth = useSelector((state) => state.auth);
   const navigate = useNavigate();
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!auth.token) {

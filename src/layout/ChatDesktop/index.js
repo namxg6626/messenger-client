@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Layout, Row, Col, Divider, Dropdown, Menu, Button } from 'antd';
+import { Layout, Row, Col, Divider, Dropdown, Menu } from 'antd';
 import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
