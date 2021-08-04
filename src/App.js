@@ -1,23 +1,23 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
-
-import { useDispatch } from 'react-redux';
-import { authRestoreToken } from './store/auth/auth.action';
 
 import routes from './routes';
 import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
+import { useDispatch, useSelector } from 'react-redux';
+import { authRestoreToken } from '@store/auth/auth.action';
 
-function App() {
-  // <Routes>
-  //   <Route path='/messages' element={<ChatDesktop />} />
-  //   <Navigate to='/messages' />
-  // </Routes>
-
+const App = memo(() => {
   const element = useRoutes(routes);
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
 
-  console.log('object');
+  useEffect(() => {
+    if (auth.storedToken) {
+      dispatch(authRestoreToken());
+    }
+  }, [dispatch, auth.storedToken]);
 
   return element;
-}
+});
 
 export default App;
