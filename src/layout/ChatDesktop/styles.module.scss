@@ -52,6 +52,17 @@
 }
 
 .appAvatar {
-  margin-bottom: 0.5rem !important;
   cursor: pointer !important;
+}
+
+.avatarSection {
+  margin-bottom: 0.5rem !important;
+}
+
+.avatarDisplayname {
+  display: block;
+}
+
+.bio {
+  color: $grayDarker;
 }

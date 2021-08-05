@@ -17,6 +17,10 @@ export const authLoginAction = (data, remember) => ({
   payload: { data, remember },
 });
 
+export const authLogoutAction = () => ({
+  type: AuthActionsEnum.LOGOUT,
+});
+
 export const authFailedAction = (error) => ({
   type: AuthActionsEnum.FAILED,
   payload: { error },
