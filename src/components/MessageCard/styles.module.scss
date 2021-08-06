@@ -1,0 +1,15 @@
+@import '/src/assets/variables/main';
+
+.thisMessageCard {
+  margin-bottom: 1rem;
+}
+
+.messagePara {
+  padding: 0.5rem 1rem !important;
+  margin-bottom: 0 !important;
+  max-width: 500px;
+  font-size: 14px;
+
+  background-color: $gray !important;
+  border-radius: 19px;
+}
