@@ -10,10 +10,16 @@
   margin-right: 0 !important;
   transition: 0.1s all ease;
   cursor: pointer;
+}
 
+.chatCardHover {
   &:hover {
     background-color: $blueExtraLight;
   }
+}
+
+.isChatCardSelected {
+  background-color: $blue;
 }
 
 .chatName {
@@ -22,7 +28,15 @@
   text-transform: capitalize;
 }
 
+.chatNameSelected {
+  color: $white !important;
+}
+
 .lastMessage {
   color: $textSecondary;
   width: 100%;
+}
+
+.lastMessageSelected {
+  color: whitesmoke !important;
 }
