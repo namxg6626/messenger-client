@@ -10,6 +10,11 @@
   max-width: 500px;
   font-size: 14px;
 
-  background-color: $gray !important;
+  background-color: darken($gray, 5) !important;
   border-radius: 19px;
+}
+
+.myMessagePara {
+  background-color: $blue !important;
+  color: $white !important;
 }
