@@ -8,12 +8,7 @@ import * as __mock__ from 'src/__mock__';
 
 import styles from './styles.module.scss';
 import { authLogoutAction } from '@store/auth/auth.action';
-import {
-  ExclamationCircleOutlined,
-  HomeOutlined,
-  HomeTwoTone,
-  LogoutOutlined,
-} from '@ant-design/icons';
+import { ExclamationCircleOutlined, HomeTwoTone, LogoutOutlined } from '@ant-design/icons';
 
 export function ChatDesktop() {
   const navigate = useNavigate();

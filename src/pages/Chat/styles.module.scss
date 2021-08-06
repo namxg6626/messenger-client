@@ -1,7 +1,13 @@
-@import '/src/assets/variables/colors';
+@import '/src/assets/variables/main';
 
-.listOfMessages {
-  flex-grow: 1;
+.thisScreen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.chatInputWrapper {
+  width: 100%;
 }
 
 .chatInput {
@@ -27,7 +33,15 @@
   display: flex;
   flex-direction: column;
   background-color: $white;
-  height: 100%;
+}
+
+.listOfMessages {
+  @include vertical-scrollbar();
+  flex: 1 1 auto;
+  min-height: 0px;
+  padding: 0 0.5rem;
+
+  background-color: $white;
 }
 
 .resetLineHeight {
