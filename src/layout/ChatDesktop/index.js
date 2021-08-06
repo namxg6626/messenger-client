@@ -15,6 +15,8 @@ export function ChatDesktop() {
   const { data = {} } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
+  const [selectedChat, setSelectedChat] = useState('');
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogoutClick = () => {
@@ -33,17 +35,27 @@ export function ChatDesktop() {
     navigate('/messages');
   };
 
+  const handleChatCardClick = (idChat) => {
+    setSelectedChat(idChat);
+    navigate('/messages/' + idChat);
+  };
+
   const _renderMockConversations = () => {
-    return __mock__.conversations.map((conversation) => (
-      <Col key={conversation._id} span={24}>
-        <ChatCard
-          from={conversation.from}
-          avatar={conversation.avatar}
-          lastMessage={conversation.lastMessage}
-          onClick={() => navigate('/messages/' + conversation._id)}
-        />
-      </Col>
-    ));
+    return __mock__.conversations.map((conversation) => {
+      const isSelected = conversation._id === selectedChat;
+      console.log(`isSelected`, isSelected);
+      return (
+        <Col key={conversation._id} span={24}>
+          <ChatCard
+            isSelected={isSelected}
+            from={conversation.from}
+            avatar={conversation.avatar}
+            lastMessage={conversation.lastMessage}
+            onClick={() => handleChatCardClick(conversation._id)}
+          />
+        </Col>
+      );
+    });
   };
 
   const menu = (
