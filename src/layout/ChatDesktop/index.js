@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import { Layout, Row, Col, Divider, Dropdown, Menu, Modal } from 'antd';
 import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
@@ -9,11 +10,14 @@ import * as __mock__ from 'src/__mock__';
 import styles from './styles.module.scss';
 import { authLogoutAction } from '@store/auth/auth.action';
 import { ExclamationCircleOutlined, HomeTwoTone, LogoutOutlined } from '@ant-design/icons';
+import { useAuthenticatedSocket } from '@socket/hooks';
+import { SocketEventEnum } from '@socket/events';
 
 export function ChatDesktop() {
   const navigate = useNavigate();
   const { data = {} } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const socket = useAuthenticatedSocket();
 
   const [selectedChat, setSelectedChat] = useState('');
 
@@ -40,10 +44,14 @@ export function ChatDesktop() {
     navigate('/messages/' + idChat);
   };
 
+  useEffect(() => {
+    socket?.emit(SocketEventEnum.CLIENT_GET_CONVERSATIONS);
+    socket?.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) => console.log(`data`, data));
+  }, [socket]);
+
   const _renderMockConversations = () => {
     return __mock__.conversations.map((conversation) => {
       const isSelected = conversation._id === selectedChat;
-      console.log(`isSelected`, isSelected);
       return (
         <Col key={conversation._id} span={24}>
           <ChatCard

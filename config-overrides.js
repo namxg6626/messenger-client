@@ -7,5 +7,6 @@ module.exports = override(
     '@modules': path.resolve(__dirname, 'src/modules'),
     '@utils': path.resolve(__dirname, 'src/utils'),
     '@store': path.resolve(__dirname, 'src/store'),
+    '@socket': path.resolve(__dirname, 'src/socket'),
   }),
 );
