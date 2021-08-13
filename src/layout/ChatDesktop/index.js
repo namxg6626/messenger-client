@@ -17,7 +17,7 @@ export function ChatDesktop() {
   const navigate = useNavigate();
   const { data = {} } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const socket = useAuthenticatedSocket();
+  const { socket, ctxSetSocket } = useAuthenticatedSocket();
 
   const [selectedChat, setSelectedChat] = useState('');
 
@@ -29,6 +29,8 @@ export function ChatDesktop() {
 
   const handleLogoutModalOk = () => {
     dispatch(authLogoutAction());
+    socket.disconnect();
+    ctxSetSocket(null);
   };
 
   const handleLogoutModalCancel = () => {
@@ -46,7 +48,6 @@ export function ChatDesktop() {
 
   useEffect(() => {
     socket?.emit(SocketEventEnum.CLIENT_GET_CONVERSATIONS);
-    socket?.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) => console.log(`data`, data));
   }, [socket]);
 
   const _renderMockConversations = () => {

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import io from 'socket.io-client';
 import SocketReactContext from './SocketReactContext';
 import { useSelector } from 'react-redux';
@@ -8,23 +8,32 @@ export const useAuthenticatedSocket = () => {
   const { ctxSetSocket, socket } = useContext(SocketReactContext);
   const auth = useSelector((state) => state.auth);
 
-  const newSocket = io(process.env.REACT_APP_SOCKETIO_URI, {
-    auth: {
-      token: auth.token,
-    },
-  });
+  useEffect(() => {
+    if (!socket) {
+      const newSocket = io(process.env.REACT_APP_SOCKETIO_URI, {
+        auth: {
+          token: auth.token,
+        },
+      });
 
-  if (!socket) {
-    ctxSetSocket(newSocket);
-  }
+      ctxSetSocket(newSocket);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.token, socket]);
 
-  console.log(`newSocket`, newSocket);
+  useEffect(() => {
+    if (socket) {
+      socket.on(SocketEventEnum.CONNECT_ERROR, (error) => {
+        console.log(`error`, error);
+      });
 
-  newSocket.on(SocketEventEnum.CONNECT_ERROR, (error) => {
-    console.log(`error`, error);
-  });
+      socket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
 
-  newSocket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
+      socket.on(SocketEventEnum.SV_SEND_CURR_USER, (e) => console.log(`curr user`, e));
 
-  return socket;
+      socket.on(SocketEventEnum.SV_SEND_USERS_ONLINE, (e) => console.log(`onlines`, e));
+    }
+  }, [socket]);
+
+  return { socket, ctxSetSocket };
 };
