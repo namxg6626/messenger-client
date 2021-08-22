@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Layout } from 'antd';
 import styled from 'styled-components';
 import { colors } from '../../assets/variables/colors';
@@ -5,7 +6,9 @@ import { colors } from '../../assets/variables/colors';
 const { Sider } = Layout;
 const siderWidth = '400px';
 
-export const StyledSider = styled((props) => <Sider aria-label='styled-ant-sider' {...props} />)`
+export const StyledSider = styled(
+  forwardRef((props, ref) => <Sider aria-label='styled-ant-sider' {...props} ref={ref} />),
+)`
   position: sticky;
   left: 0;
   top: 0;

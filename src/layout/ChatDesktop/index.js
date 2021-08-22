@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-import { Layout, Row, Col, Divider, Dropdown, Menu, Modal, Tabs, Typography } from 'antd';
-import { StyledSider } from './styled';
+import { Layout, Row, Col, Divider, Dropdown, Menu, Modal, Tabs, Typography, Button } from 'antd';
+import { StyledSider, StyledSiderForwarded } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +23,11 @@ import { SocketEventEnum } from '@socket/events';
 import { v4 } from 'uuid';
 
 const { TabPane } = Tabs;
+const TAB_KEYS = {
+  CONVERSATIONS: '1',
+  CONTACTS: '2',
+  CONVERSATIONS_TEST: '3',
+};
 
 export function ChatDesktop() {
   const navigate = useNavigate();
@@ -30,6 +35,7 @@ export function ChatDesktop() {
   const dispatch = useDispatch();
   const { socket, ctxSetSocket } = useAuthenticatedSocket();
   const isConnected = !!socket?.connected;
+  const headerRef = useRef(null);
 
   // socket
   const [listOnlines, setListOnlines] = useState([]);
@@ -37,7 +43,10 @@ export function ChatDesktop() {
   const [selectedChat, setSelectedChat] = useState('');
   const [conversations, setConversations] = useState([]);
 
+  // functionalities
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [tabPaneHeight, setTabPaneHeight] = useState(0);
+  const [tabKey, setTabKey] = useState(TAB_KEYS.CONVERSATIONS);
 
   // -handler
   const handleLogoutClick = () => {
@@ -78,7 +87,11 @@ export function ChatDesktop() {
     }
   }, [isConnected, socket]);
 
-  console.log(`listOnlines`, listOnlines);
+  useEffect(() => {
+    if (!tabPaneHeight && headerRef.current) {
+      setTabPaneHeight(headerRef?.current?.clientHeight);
+    }
+  }, [tabPaneHeight]);
 
   // -renderer
 
@@ -102,9 +115,33 @@ export function ChatDesktop() {
   const _renderConversations = () => {
     if (!conversations.length)
       return (
-        <Row justify='center' className={styles.emptyConversationRow}>
+        <Row
+          align='middle'
+          style={{ height: `calc(100vh - ${tabPaneHeight}px)` }}
+          className={styles.emptyConversationPane}>
           <Col span={24}>
-            <RocketOutlined className={styles.emptyConversationIcon} />
+            <Row justify='center' className={styles.emptyConversationRow}>
+              <Col>
+                <RocketOutlined className={styles.emptyConversationIcon} />
+              </Col>
+            </Row>
+            <Row justify='center'>
+              <Col>
+                <Typography.Title style={{ textAlign: 'center' }} level={5} type='secondary'>
+                  Opps! Bạn chưa có cuộc trò chuyện nào
+                </Typography.Title>
+                <Typography.Paragraph style={{ textAlign: 'center' }} type='secondary'>
+                  Bấm nút bên dưới để xem ai đang hoạt động nhé
+                </Typography.Paragraph>
+              </Col>
+            </Row>
+            <Row justify='center'>
+              <Col>
+                <Button onClick={() => setTabKey(TAB_KEYS.CONTACTS)} type='primary'>
+                  Khám phá liên lạc
+                </Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
       );
@@ -167,7 +204,7 @@ export function ChatDesktop() {
           Bạn muốn đăng xuất khỏi tài khoản <b>{data.displayname}</b>?
         </p>
       </Modal>
-      <StyledSider className={styles.siderScroll}>
+      <StyledSider ref={headerRef} className={styles.siderScroll}>
         <div className={styles.siderHead}>
           <Row gutter={16} align='middle' className={styles.avatarSection}>
             <Col>
@@ -196,15 +233,16 @@ export function ChatDesktop() {
           </Row>
           {/* <Divider /> */}
         </div>
-        <Tabs defaultActiveKey={1}>
+        <Tabs activeKey={tabKey} onChange={(key) => setTabKey(key)}>
           <TabPane
+            style={{ minHeight: '100%' }}
             tab={
               <span>
                 <CommentOutlined />
                 Trò chuyện
               </span>
             }
-            key={1}>
+            key={TAB_KEYS.CONVERSATIONS}>
             {_renderConversations()}
           </TabPane>
           <TabPane
@@ -214,10 +252,10 @@ export function ChatDesktop() {
                 Liên lạc
               </span>
             }
-            key={3}>
+            key={TAB_KEYS.CONTACTS}>
             {_renderContacts()}
           </TabPane>
-          <TabPane tab='Trò chuyện test' key={2}>
+          <TabPane tab='Trò chuyện test' key={TAB_KEYS.CONVERSATIONS_TEST}>
             {_renderMockConversations()}
           </TabPane>
         </Tabs>

@@ -82,8 +82,14 @@
   }
 }
 
+.emptyConversationPane {
+  padding-bottom: 1rem;
+  transform: translateY(-2rem);
+}
+
 .emptyConversationRow {
   color: $grayDarker;
+  margin-bottom: 1rem;
 }
 
 .emptyConversationIcon {
