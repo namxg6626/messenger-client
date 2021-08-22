@@ -28,10 +28,6 @@ export const useAuthenticatedSocket = () => {
       });
 
       socket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
-
-      socket.on(SocketEventEnum.SV_SEND_CURR_USER, (e) => console.log(`curr user`, e));
-
-      socket.on(SocketEventEnum.SV_SEND_USERS_ONLINE, (e) => console.log(`onlines`, e));
     }
   }, [socket]);
 

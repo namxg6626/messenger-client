@@ -66,3 +66,27 @@
 .bio {
   color: $grayDarker;
 }
+
+.contactRow {
+  position: relative;
+
+  padding: 0.5rem 0;
+  margin: 0 -0.5rem;
+
+  transition: all ease 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($blueExtraLight, 2.5);
+    padding-left: 0.25rem;
+  }
+}
+
+.emptyConversationRow {
+  color: $grayDarker;
+}
+
+.emptyConversationIcon {
+  font-size: 64px;
+  font-weight: 100;
+}
