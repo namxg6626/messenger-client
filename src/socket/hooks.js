@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { SocketEventEnum } from './events';
 
 export const useAuthenticatedSocket = () => {
-  const { ctxSetSocket, socket } = useContext(SocketReactContext);
+  const { ctxSetSocket, socket, socketService } = useContext(SocketReactContext);
   const auth = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -17,6 +17,8 @@ export const useAuthenticatedSocket = () => {
       });
 
       ctxSetSocket(newSocket);
+      socketService.setSocket(newSocket);
+      socketService.clientFetchUser();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.token, socket]);
@@ -31,5 +33,5 @@ export const useAuthenticatedSocket = () => {
     }
   }, [socket]);
 
-  return { socket, ctxSetSocket };
+  return { socket, ctxSetSocket, socketService };
 };

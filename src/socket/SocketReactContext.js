@@ -1,5 +1,20 @@
 import { createContext } from 'react';
+import { io } from 'socket.io-client';
+import { SocketService } from './service';
 
-const SocketContext = createContext({ ctxSetSocket: null, socket: null });
+/**
+ * @typedef {Object} SocketContextType
+ * @property {(socket: import('socket.io-client').Socket) => void} ctxSetSocket
+ * @property {SocketService} socketService
+ * @property {(socketService: SocketService) => any} ctxSetSocketService
+ */
+const initialContext = {
+  socket: null,
+  ctxSetSocket: (_socket) => null,
+  socketService: new SocketService(),
+  ctxSetSocketService: (_socketService) => null,
+};
+
+const SocketContext = createContext(initialContext);
 
 export default SocketContext;

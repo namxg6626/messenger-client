@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 
 import { Layout, Row, Col, Divider, Dropdown, Menu, Modal, Tabs, Typography, Button } from 'antd';
-import { StyledSider, StyledSiderForwarded } from './styled';
+import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ import {
 } from '@ant-design/icons';
 import { useAuthenticatedSocket } from '@socket/hooks';
 import { SocketEventEnum } from '@socket/events';
+import { TypeConversation } from '@socket/constants';
 
 import { v4 } from 'uuid';
 
@@ -33,7 +34,7 @@ export function ChatDesktop() {
   const navigate = useNavigate();
   const { data = {} } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const { socket, ctxSetSocket } = useAuthenticatedSocket();
+  const { socket, ctxSetSocket, socketService } = useAuthenticatedSocket();
   const isConnected = !!socket?.connected;
   const headerRef = useRef(null);
 
@@ -42,6 +43,7 @@ export function ChatDesktop() {
   const [user, setUser] = useState({});
   const [selectedChat, setSelectedChat] = useState('');
   const [conversations, setConversations] = useState([]);
+  const [isJoining, setIsJoining] = useState(false);
 
   // functionalities
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -72,20 +74,22 @@ export function ChatDesktop() {
     navigate('/messages/' + idChat);
   };
 
+  const handleContactClick = (contactId) => {
+    socketService.clientCreatePrivateConversation();
+  };
+
   // -useEffect
   useEffect(() => {
     if (socket) {
-      socket?.emit(SocketEventEnum.CLIENT_GET_CONVERSATIONS);
-
-      socket?.on(SocketEventEnum.SV_SEND_CURR_USER, (e) => setUser(e));
-      socket?.on(SocketEventEnum.SV_SEND_USERS_ONLINE, (e) => {
-        setListOnlines(e);
-      });
+      socketService.clientFetchUser((user) => setUser(user));
+      socketService.clientFetchOnlines((users) => setListOnlines(users));
       socket?.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) =>
         setConversations(() => data),
       );
     }
-  }, [isConnected, socket]);
+  }, [isConnected, socket, socketService]);
+
+  console.log(`listOnlines`, listOnlines);
 
   useEffect(() => {
     if (!tabPaneHeight && headerRef.current) {
@@ -176,6 +180,8 @@ export function ChatDesktop() {
       ));
   };
 
+  const _renderJoining = () => {};
+
   const menu = (
     <Menu>
       <Menu.Item icon={<HomeTwoTone />} onClick={handleHomeClick}>
@@ -262,9 +268,7 @@ export function ChatDesktop() {
         {/* <Row gutter={16}>{_renderConversations()}</Row> */}
       </StyledSider>
       <Divider className={styles.dividerVertical} type='vertical' />
-      <Layout>
-        <Outlet />
-      </Layout>
+      <Layout>{isJoining ? _renderJoining() : <Outlet />}</Layout>
     </Layout>
   );
 }
