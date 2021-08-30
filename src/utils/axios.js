@@ -1,9 +1,9 @@
 import Axios from 'axios';
-import { BASE_URL } from 'src/constants/endpoint';
+import { config } from 'src/constants/config';
 
 const axios = (() => {
   const instance = Axios.create({
-    baseURL: BASE_URL,
+    baseURL: config.BASE_URL,
   });
 
   return instance;

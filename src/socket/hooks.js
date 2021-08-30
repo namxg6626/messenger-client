@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import SocketReactContext from './SocketReactContext';
 import { useSelector } from 'react-redux';
 import { SocketEventEnum } from './events';
+import { config } from 'src/constants/config';
 
 export const useAuthenticatedSocket = () => {
   const { ctxSetSocket, socket, socketService } = useContext(SocketReactContext);
@@ -10,7 +11,7 @@ export const useAuthenticatedSocket = () => {
 
   useEffect(() => {
     if (!socket) {
-      const newSocket = io(process.env.REACT_APP_SOCKETIO_URI, {
+      const newSocket = io(config.SOCKETIO_URI, {
         auth: {
           token: auth.token,
         },
@@ -31,6 +32,12 @@ export const useAuthenticatedSocket = () => {
 
       socket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
     }
+  }, [socket]);
+
+  useEffect(() => {
+    return () => {
+      if (socket) socket.offAny();
+    };
   }, [socket]);
 
   return { socket, ctxSetSocket, socketService };
