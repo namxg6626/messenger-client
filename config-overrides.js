@@ -8,5 +8,6 @@ module.exports = override(
     '@utils': path.resolve(__dirname, 'src/utils'),
     '@store': path.resolve(__dirname, 'src/store'),
     '@socket': path.resolve(__dirname, 'src/socket'),
+    '@models': path.resolve(__dirname, 'src/typedef/models'),
   }),
 );

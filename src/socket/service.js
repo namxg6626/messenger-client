@@ -1,33 +1,7 @@
 import io from 'socket.io-client';
 import { TypeConversation } from './constants';
 import { SocketEventEnum } from './events';
-
-/**
- *
- * @typedef {Object} User
- * @property {string} _id
- * @property {string} username
- * @property {string} displayname
- * @property {boolean} isOnline
- */
-
-/**
- * @typedef {Object} Conversation
- * @property {string} _id
- * @property {string} typeConversation
- * @property {string} title
- * @property {string} from
- * @property {string} to
- * @property {Array<string>} members
- * @property {{
- *    messageId: string;
- *    content: string
- * }} newMessage
- */
-
-/**
- *
- */
+import '@models/index';
 
 export class SocketService {
   /**
@@ -157,6 +131,14 @@ export class SocketService {
    */
   onReceiveJustSentMessage = (callback) => {
     this.socket.on(SocketEventEnum.SV_SEND_MESSAGE_TO_AUTHOR, callback);
+  };
+
+  /**
+   *
+   * @param {({ fromUser: User, conversation: Conversation, message: any })} callback
+   */
+  onReceiveOtherRoomMessage = (callback) => {
+    this.socket.on(SocketEventEnum.SV_SEND_MESSAGE, callback);
   };
 
   /**

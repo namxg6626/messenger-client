@@ -7,7 +7,8 @@
       "@assets/*": ["./src/assets/*"],
       "@utils/*": ["./src/utils/*"],
       "@store/*": ["./src/store/*"],
-      "@socket/*": ["./src/socket/*"]
+      "@socket/*": ["./src/socket/*"],
+      "@models/*": ["./src/typdef/models/*"]
     }
   },
   "include": ["src"]
