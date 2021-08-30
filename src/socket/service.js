@@ -67,6 +67,18 @@ export class SocketService {
 
   /**
    *
+   * @param {(conversations: Conversation[]) => any} callback
+   */
+  clientFetchConversations = (callback) => {
+    this.socket.emit(SocketEventEnum.CLIENT_GET_CONVERSATIONS);
+    this.socket.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) => {
+      console.log(`data`, data);
+      callback(data);
+    });
+  };
+
+  /**
+   *
    * @param {string} title name of the conversation
    * @param {string} from id of the creator
    * @param {string} to id of the partner
@@ -77,6 +89,7 @@ export class SocketService {
       title,
       from: this.user._id,
       to,
+      members: [this.user._id, to],
     });
   };
 
@@ -132,17 +145,9 @@ export class SocketService {
 
   /**
    *
-   * @param {(conversations?: Array<Conversation>) => any} callback
-   */
-  onReceiveConversations = (callback) => {
-    this.socket.on(SocketEventEnum.SV_SEND_CONVERSATIONS, callback);
-  };
-
-  /**
-   *
    * @param {(conversation?: Conversation) => any} callback
    */
-  onReceiceCurrentConversation = (callback) => {
+  onReceiveCurrentConversation = (callback) => {
     this.socket.on(SocketEventEnum.SV_SEND_CURR_CONVERSATION, callback);
   };
 

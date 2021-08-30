@@ -18,8 +18,6 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { useAuthenticatedSocket } from '@socket/hooks';
-import { SocketEventEnum } from '@socket/events';
-import { TypeConversation } from '@socket/constants';
 
 import { v4 } from 'uuid';
 
@@ -84,10 +82,8 @@ export function ChatDesktop() {
     if (socket) {
       socketService.clientFetchUser((user) => setUser(user));
       socketService.clientFetchOnlines((users) => setListOnlines(users));
-      socketService.onReceiveConversations((data) => {
-        setConversations(() => data);
-      });
-      socketService.onReceiceCurrentConversation((conversation) => {
+      socketService.clientFetchConversations((conversations) => setConversations(conversations));
+      socketService.onReceiveCurrentConversation((conversation) => {
         console.log(`conversation`, conversation);
         setIsJoining(false);
         navigate('/messages/' + conversation._id);
