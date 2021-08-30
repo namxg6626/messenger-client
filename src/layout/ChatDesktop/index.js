@@ -75,7 +75,8 @@ export function ChatDesktop() {
   };
 
   const handleContactClick = (contactId) => {
-    socketService.clientCreatePrivateConversation();
+    setIsJoining(true);
+    socketService.clientCreatePrivateConversation(`private ${user._id} - ${contactId}`, contactId);
   };
 
   // -useEffect
@@ -83,13 +84,16 @@ export function ChatDesktop() {
     if (socket) {
       socketService.clientFetchUser((user) => setUser(user));
       socketService.clientFetchOnlines((users) => setListOnlines(users));
-      socket?.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) =>
-        setConversations(() => data),
-      );
+      socketService.onReceiveConversations((data) => {
+        setConversations(() => data);
+      });
+      socketService.onReceiceCurrentConversation((conversation) => {
+        console.log(`conversation`, conversation);
+        setIsJoining(false);
+        navigate('/messages/' + conversation._id);
+      });
     }
-  }, [isConnected, socket, socketService]);
-
-  console.log(`listOnlines`, listOnlines);
+  }, [isConnected, navigate, socket, socketService]);
 
   useEffect(() => {
     if (!tabPaneHeight && headerRef.current) {
@@ -156,9 +160,9 @@ export function ChatDesktop() {
         <ChatCard
           key={conversation._id || v4()}
           isSelected={isSelected}
-          from={conversation.from}
+          from={conversation.title}
           avatar={conversation.avatar}
-          lastMessage={conversation.lastMessage}
+          lastMessage={conversation?.newMessage?.content}
           onClick={() => handleChatCardClick(conversation._id)}
         />
       );
@@ -169,7 +173,12 @@ export function ChatDesktop() {
     return listOnlines
       .filter((online) => online._id !== data.userId)
       .map((online) => (
-        <Row className={styles.contactRow} align='middle' key={online._id || v4()} gutter={16}>
+        <Row
+          onClick={() => handleContactClick(online._id)}
+          className={styles.contactRow}
+          align='middle'
+          key={online._id || v4()}
+          gutter={16}>
           <Col>
             <AppAvatar size='small' alt={online.displayname} />
           </Col>
@@ -180,7 +189,9 @@ export function ChatDesktop() {
       ));
   };
 
-  const _renderJoining = () => {};
+  const _renderJoining = () => {
+    return 'loading...';
+  };
 
   const menu = (
     <Menu>
@@ -260,9 +271,6 @@ export function ChatDesktop() {
             }
             key={TAB_KEYS.CONTACTS}>
             {_renderContacts()}
-          </TabPane>
-          <TabPane tab='Trò chuyện test' key={TAB_KEYS.CONVERSATIONS_TEST}>
-            {_renderMockConversations()}
           </TabPane>
         </Tabs>
         {/* <Row gutter={16}>{_renderConversations()}</Row> */}

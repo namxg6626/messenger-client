@@ -14,7 +14,7 @@ const routes = [
     ),
     children: [
       {
-        path: ':id',
+        path: ':conversationId',
         element: <Chat />,
       },
       {
