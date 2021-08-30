@@ -89,6 +89,10 @@ export function ChatDesktop() {
         navigate('/messages/' + conversation._id);
       });
     }
+
+    return () => {
+      socketService.destroyAllListeners();
+    };
   }, [isConnected, navigate, socket, socketService]);
 
   useEffect(() => {
