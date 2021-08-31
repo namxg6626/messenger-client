@@ -10,6 +10,7 @@
     "antd": "^4.16.3",
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
+    "craco": "^0.0.3",
     "cross-env": "^7.0.3",
     "deep-equal": "^2.0.5",
     "history": "^5.0.0",
@@ -57,6 +58,7 @@
     ]
   },
   "devDependencies": {
+    "@welldone-software/why-did-you-render": "^6.2.1",
     "customize-cra": "^1.0.0",
     "path": "^0.12.7",
     "react-app-rewired": "^2.1.8"

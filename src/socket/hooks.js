@@ -4,10 +4,11 @@ import SocketReactContext from './SocketReactContext';
 import { useSelector } from 'react-redux';
 import { SocketEventEnum } from './events';
 import { config } from 'src/constants/config';
+import equal from 'deep-equal';
 
 export const useAuthenticatedSocket = () => {
   const { ctxSetSocket, socket, socketService } = useContext(SocketReactContext);
-  const auth = useSelector((state) => state.auth);
+  const auth = useSelector((state) => state.auth, equal);
 
   useEffect(() => {
     if (!socket) {
@@ -31,13 +32,9 @@ export const useAuthenticatedSocket = () => {
       });
 
       socket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
-    }
-  }, [socket]);
 
-  useEffect(() => {
-    return () => {
-      if (socket) socket.offAny();
-    };
+      console.log(`socket`, socket);
+    }
   }, [socket]);
 
   return { socket, ctxSetSocket, socketService };

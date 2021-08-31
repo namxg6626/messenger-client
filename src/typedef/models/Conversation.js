@@ -1,11 +1,14 @@
 /**
  * @typedef {Object} Conversation
  * @property {string} _id
- * @property {string} typeConversation
+ * @property {'group' | 'private'} typeConversation
  * @property {string} title
  * @property {string} from
  * @property {string} to
- * @property {Array<string>} members
+ * @property {Array<{
+ *    _id: string;
+ *    displayname: string;
+ * }>} members
  * @property {{
  *    messageId: string;
  *    content: string

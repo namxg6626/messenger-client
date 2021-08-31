@@ -36,11 +36,16 @@ export function ChatDesktop() {
   const isConnected = !!socket?.connected;
   const headerRef = useRef(null);
 
-  // socket
+  /** @type {[User[], (users: User[]) => any]} */
   const [listOnlines, setListOnlines] = useState([]);
+
+  /** @type {[User, (user: User) => any]} */
   const [user, setUser] = useState({});
-  const [selectedChat, setSelectedChat] = useState('');
+
+  /** @type {[Conversation[], (conversation: Conversation[]) => any]} */
   const [conversations, setConversations] = useState([]);
+
+  const [selectedChat, setSelectedChat] = useState('');
   const [isJoining, setIsJoining] = useState(false);
 
   // functionalities
@@ -84,7 +89,6 @@ export function ChatDesktop() {
       socketService.clientFetchOnlines((users) => setListOnlines(users));
       socketService.clientFetchConversations((conversations) => setConversations(conversations));
       socketService.onReceiveCurrentConversation((conversation) => {
-        console.log(`conversation`, conversation);
         setIsJoining(false);
         navigate('/messages/' + conversation._id);
       });
@@ -102,23 +106,6 @@ export function ChatDesktop() {
   }, [tabPaneHeight]);
 
   // -renderer
-
-  const _renderMockConversations = () => {
-    return __mock__.conversations.map((conversation) => {
-      const isSelected = conversation._id === selectedChat;
-      return (
-        <Col key={conversation._id} span={24}>
-          <ChatCard
-            isSelected={isSelected}
-            from={conversation.from}
-            avatar={conversation.avatar}
-            lastMessage={conversation.lastMessage}
-            onClick={() => handleChatCardClick(conversation._id)}
-          />
-        </Col>
-      );
-    });
-  };
 
   const _renderConversations = () => {
     if (!conversations.length)
@@ -156,11 +143,16 @@ export function ChatDesktop() {
 
     return conversations.map((conversation) => {
       const isSelected = conversation._id === selectedChat;
+      const conversationName =
+        conversation.typeConversation === 'private'
+          ? conversation.members.find((m) => m._id !== user._id).displayname
+          : conversation.title;
+
       return (
         <ChatCard
           key={conversation._id || v4()}
           isSelected={isSelected}
-          from={conversation.title}
+          from={conversationName}
           avatar={conversation.avatar}
           lastMessage={conversation?.newMessage?.content}
           onClick={() => handleChatCardClick(conversation._id)}

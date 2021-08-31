@@ -46,7 +46,6 @@ export class SocketService {
   clientFetchConversations = (callback) => {
     this.socket.emit(SocketEventEnum.CLIENT_GET_CONVERSATIONS);
     this.socket.on(SocketEventEnum.SV_SEND_CONVERSATIONS_OF_USER, (data) => {
-      console.log(`data`, data);
       callback(data);
     });
   };
@@ -127,7 +126,11 @@ export class SocketService {
 
   /**
    * handle message that you've just sent to the room
-   * @param {(message: string) => any} callback
+   * @param {(data: {
+   *  conversation: Conversation;
+   *  fromUser: User;
+   *  message: Message
+   * }) => any} callback
    */
   onReceiveJustSentMessage = (callback) => {
     this.socket.on(SocketEventEnum.SV_SEND_MESSAGE_TO_AUTHOR, callback);
@@ -135,18 +138,13 @@ export class SocketService {
 
   /**
    *
-   * @param {({ fromUser: User, conversation: Conversation, message: any })} callback
+   * @param {({ fromUser: User, conversation: Conversation, message: Message }) => any} callback
    */
-  onReceiveOtherRoomMessage = (callback) => {
-    this.socket.on(SocketEventEnum.SV_SEND_MESSAGE, callback);
-  };
-
-  /**
-   * handle any other incoming messages
-   * @param {(message: string) => any} callback
-   */
-  onReceiveMessageOfOthers = (callback) => {
-    this.socket.on(SocketEventEnum.SV_SEND_MESSAGE, callback);
+  onReceiveOthersMessage = (callback) => {
+    this.socket.on(SocketEventEnum.SV_SEND_MESSAGE, (data) => {
+      console.log(`data`, data);
+      callback(data);
+    });
   };
 
   /**
@@ -155,5 +153,13 @@ export class SocketService {
    */
   destroyAllListeners = () => {
     this.socket.offAny();
+  };
+
+  /**
+   * destroy a listener
+   * @param {(...args?: any[]) => any} handler
+   */
+  destroyListener = (handler) => {
+    this.socket.offAny(handler);
   };
 }

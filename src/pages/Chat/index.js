@@ -1,16 +1,17 @@
-import { useRef, useEffect, useContext, useState } from 'react';
+import { useRef, useEffect, useContext, useState, useMemo, useCallback } from 'react';
 import SocketContext from '@socket/SocketReactContext';
 import { useParams } from 'react-router-dom';
 import { Divider, Row, Col, Button, Layout, Avatar, Typography } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { BaseInput } from '@components/index';
 
-import { MessageCard } from '@components/index';
 import { generateRandomColor } from 'src/utils';
 import styles from './styles.module.scss';
-import * as __mock__ from 'src/__mock__';
 
 import { useForm } from 'react-hook-form';
+
+import '@models/index';
+import { MessagesList } from '@modules/Chat';
 
 const { Header } = Layout;
 const { Paragraph, Text } = Typography;
@@ -19,6 +20,10 @@ export default function Chat() {
   const params = useParams();
   const messageEndRef = useRef(null);
   const { socketService } = useContext(SocketContext);
+  const user = socketService.getUser();
+
+  /** @type {[Message[], (messages: Messages[]) => any]} */
+  const [messages, setMessages] = useState([]);
 
   const [isSending, setIsSending] = useState(false);
   const { register, handleSubmit } = useForm({
@@ -26,6 +31,8 @@ export default function Chat() {
       message: '',
     },
   });
+
+  // -handler
 
   const scrollToBottom = () => {
     if (messageEndRef.current) {
@@ -38,14 +45,7 @@ export default function Chat() {
     socketService.clientSendMessage(params.conversationId, user._id, message);
   };
 
-  const renderMockMessages = () => {
-    return __mock__.messages.map(({ avatar, id, message }, i) => (
-      <>
-        <MessageCard key={id} avatar={avatar} message={message} me={i % 2 === 0} />
-        <MessageCard key={i} avatar={avatar} message={message} me={i % 2 === 0} />
-      </>
-    ));
-  };
+  // -useEffect
 
   useEffect(() => {
     scrollToBottom();
@@ -75,7 +75,7 @@ export default function Chat() {
           </Row>
         </Header>
         <div className={styles.listOfMessages} key='list-of-messages' aria-label='list-of-messages'>
-          {/* {renderMockMessages()} */}
+          <MessagesList />
           <div key='dummy-div-to-scroll' ref={messageEndRef} />
         </div>
         <div className={styles.chatInputWrapper} key='chat-input' aria-label='chat-input'>
