@@ -1,7 +1,7 @@
 import { useRef, useEffect, useContext, useState, useMemo, useCallback } from 'react';
 import SocketContext from '@socket/SocketReactContext';
 import { useParams } from 'react-router-dom';
-import { Divider, Row, Col, Button, Layout, Avatar, Typography } from 'antd';
+import { Divider, Row, Col, Button, Layout, Avatar, Typography, Tooltip } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import { BaseInput } from '@components/index';
 
@@ -9,9 +9,11 @@ import { generateRandomColor } from 'src/utils';
 import styles from './styles.module.scss';
 
 import { useForm } from 'react-hook-form';
+import { MessagesList } from '@modules/Chat';
+
+import _ from 'lodash';
 
 import '@models/index';
-import { MessagesList } from '@modules/Chat';
 
 const { Header } = Layout;
 const { Paragraph, Text } = Typography;
@@ -20,13 +22,12 @@ export default function Chat() {
   const params = useParams();
   const messageEndRef = useRef(null);
   const { socketService } = useContext(SocketContext);
-  const user = socketService.getUser();
 
   /** @type {[Message[], (messages: Messages[]) => any]} */
   const [messages, setMessages] = useState([]);
 
   const [isSending, setIsSending] = useState(false);
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     defaultValues: {
       message: '',
     },
@@ -43,9 +44,34 @@ export default function Chat() {
   const handleFormSubmit = ({ message }) => {
     const user = socketService.getUser();
     socketService.clientSendMessage(params.conversationId, user._id, message);
+    setIsSending(true);
+    reset({
+      message: '',
+    });
   };
 
   // -useEffect
+
+  const handleReceiveMessage = useCallback(({ conversation, fromUser, message }) => {
+    setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
+  }, []);
+
+  const handleReceiveOwnMessage = useCallback(({ conversation, fromUser, message }) => {
+    setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
+    setIsSending(false);
+    scrollToBottom();
+  }, []);
+
+  useEffect(() => {
+    socketService.onReceiveJustSentMessage(handleReceiveOwnMessage);
+
+    socketService.onReceiveOthersMessage(handleReceiveMessage);
+
+    return () => {
+      socketService.destroyListener(handleReceiveMessage);
+      socketService.destroyListener(handleReceiveOwnMessage);
+    };
+  }, [handleReceiveMessage, handleReceiveOwnMessage, socketService]);
 
   useEffect(() => {
     scrollToBottom();
@@ -75,14 +101,18 @@ export default function Chat() {
           </Row>
         </Header>
         <div className={styles.listOfMessages} key='list-of-messages' aria-label='list-of-messages'>
-          <MessagesList />
+          <MessagesList messages={messages} />
           <div key='dummy-div-to-scroll' ref={messageEndRef} />
         </div>
         <div className={styles.chatInputWrapper} key='chat-input' aria-label='chat-input'>
           <Divider className={styles.divider} />
           <Row gutter={16} className={styles.chatInput} align='middle'>
             <Col flex='1'>
-              <BaseInput fullWidth placeholder='Nhập tin nhắn...' {...register('message')} />
+              <BaseInput
+                fullWidth
+                placeholder='Nhập tin nhắn...'
+                {...register('message', { required: 'Bạn chưa nhập tin nhắn' })}
+              />
             </Col>
             <Col>
               <Button

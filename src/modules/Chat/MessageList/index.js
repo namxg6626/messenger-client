@@ -1,32 +1,14 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-
 import { MessageCard } from '@components/MessageCard';
 import { getShortName } from '@utils/getters';
 import { useSelector } from 'react-redux';
-import SocketContext from '@socket/SocketReactContext';
-import _ from 'lodash';
+import '@models/index';
 
-export const MessagesList = () => {
+/**
+ * @param {{ messages: Message[] }} props
+ */
+export const MessagesList = ({ messages }) => {
   const auth = useSelector((state) => state.auth);
   const userId = auth.data.userId;
-  const { socketService } = useContext(SocketContext);
-
-  /** @type {[Message[], (messages: Messages[]) => any]} */
-  const [messages, setMessages] = useState([]);
-
-  const handleReceiveMessage = useCallback(({ conversation, fromUser, message }) => {
-    setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
-  }, []);
-
-  useEffect(() => {
-    socketService.onReceiveJustSentMessage(handleReceiveMessage);
-
-    socketService.onReceiveOthersMessage(handleReceiveMessage);
-
-    return () => {
-      socketService.destroyListener(handleReceiveMessage);
-    };
-  }, [handleReceiveMessage, socketService]);
 
   return (
     <div>
@@ -42,7 +24,7 @@ export const MessagesList = () => {
   );
 };
 
-MessagesList.whyDidYouRender = {
-  customName: 'test',
-  logOnDifferentValues: true,
-};
+// MessagesList.whyDidYouRender = {
+//   customName: 'test',
+//   logOnDifferentValues: true,
+// };
