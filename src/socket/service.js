@@ -118,6 +118,14 @@ export class SocketService {
 
   /**
    *
+   * @param {string} roomId
+   */
+  clientJoinRoom = (roomId) => {
+    this.socket.emit(SocketEventEnum.CLIENT_JOIN_ROOM, { roomId });
+  };
+
+  /**
+   *
    * @param {(conversation?: Conversation) => any} callback
    */
   onReceiveCurrentConversation = (callback) => {

@@ -87,7 +87,12 @@ export function ChatDesktop() {
     if (socket) {
       socketService.clientFetchUser((user) => setUser(user));
       socketService.clientFetchOnlines((users) => setListOnlines(users));
-      socketService.clientFetchConversations((conversations) => setConversations(conversations));
+      socketService.clientFetchConversations((conversations) => {
+        conversations.forEach((con) => {
+          socketService.clientJoinRoom(con._id);
+        });
+        setConversations(conversations);
+      });
       socketService.onReceiveCurrentConversation((conversation) => {
         setIsJoining(false);
         navigate('/messages/' + conversation._id);
