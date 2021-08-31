@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Row, Col, Avatar, Typography } from 'antd';
+import { AppAvatar } from '@components/index';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
@@ -17,7 +18,7 @@ export const MessageCard = memo(
     const renderOthers = () => (
       <Row className={styles.thisMessageCard} gutter={16} wrap='nowrap'>
         <Col>
-          <Avatar src={avatar} />
+          <AppAvatar alt={avatar} />
         </Col>
         <Col>
           <Paragraph className={styles.messagePara}>{message}</Paragraph>
@@ -33,7 +34,7 @@ export const MessageCard = memo(
           </Paragraph>
         </Col>
         <Col>
-          <Avatar src={avatar} />
+          <AppAvatar alt={avatar} />
         </Col>
       </Row>
     );

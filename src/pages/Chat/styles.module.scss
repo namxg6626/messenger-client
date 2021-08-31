@@ -25,6 +25,7 @@
 
 .header {
   height: 80px;
+
   background-color: $white !important;
   border-bottom: 1px solid $grayLighter !important;
 }
@@ -40,6 +41,7 @@
   flex: 1 1 auto;
   min-height: 0px;
   padding: 0 0.5rem;
+  padding-top: 1rem;
 
   background-color: $white;
 }

@@ -5,18 +5,16 @@ import { getShortName } from '@utils/getters';
 import { useSelector } from 'react-redux';
 import SocketContext from '@socket/SocketReactContext';
 import _ from 'lodash';
-import { SocketEventEnum } from '@socket/events';
 
 export const MessagesList = () => {
   const auth = useSelector((state) => state.auth);
   const userId = auth.data.userId;
-  const { socketService, socket } = useContext(SocketContext);
+  const { socketService } = useContext(SocketContext);
 
   /** @type {[Message[], (messages: Messages[]) => any]} */
   const [messages, setMessages] = useState([]);
 
   const handleReceiveMessage = useCallback(({ conversation, fromUser, message }) => {
-    console.log(`message`, message);
     setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
   }, []);
 
@@ -24,8 +22,6 @@ export const MessagesList = () => {
     socketService.onReceiveJustSentMessage(handleReceiveMessage);
 
     socketService.onReceiveOthersMessage(handleReceiveMessage);
-
-    socket.on(SocketEventEnum.SV_SEND_MESSAGE, (data) => console.log(`data`, data));
 
     return () => {
       socketService.destroyListener(handleReceiveMessage);
