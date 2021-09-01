@@ -9,7 +9,8 @@
       "@store/*": ["./src/store/*"],
       "@socket/*": ["./src/socket/*"],
       "@models/*": ["./src/typdef/models/*"],
-      "@modules/*": ["./src/modules/*"]
+      "@modules/*": ["./src/modules/*"],
+      "@http/*": ["./src/http/*"]
     }
   },
   "include": ["src"]

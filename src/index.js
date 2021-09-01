@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { Alert } from 'antd';
 
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
@@ -11,15 +12,19 @@ import store, { persistor } from './store';
 
 import reportWebVitals from './reportWebVitals';
 
+const { ErrorBoundary } = Alert;
+
 ReactDOM.render(
   <React.StrictMode>
-    <PersistGate persistor={persistor}>
-      <Provider store={store}>
-        <Router>
-          <App />
-        </Router>
-      </Provider>
-    </PersistGate>
+    <ErrorBoundary>
+      <PersistGate persistor={persistor}>
+        <Provider store={store}>
+          <Router>
+            <App />
+          </Router>
+        </Provider>
+      </PersistGate>
+    </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById('root'),
 );
