@@ -2,7 +2,7 @@ import { useRef, useEffect, useContext, useState, useMemo, useCallback, memo } f
 import SocketContext from '@socket/SocketReactContext';
 import { useParams } from 'react-router-dom';
 
-import { Divider, Row, Col, Button, Layout, Avatar, Typography } from 'antd';
+import { Divider, Row, Col, Button } from 'antd';
 
 import { SendOutlined } from '@ant-design/icons';
 
@@ -11,7 +11,6 @@ import { MessagesList, ChatHeader } from '@modules/Chat';
 
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
-import { generateRandomColor } from 'src/utils';
 import MessageHttp from '@http/message.http';
 
 import '@models/index';
@@ -120,7 +119,3 @@ const Chat = () => {
 };
 
 export default memo(Chat, () => true);
-
-Chat.whyDidYouRender = {
-  trackAllPureComponents: true,
-};

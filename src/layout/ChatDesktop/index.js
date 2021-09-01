@@ -87,11 +87,20 @@ export function ChatDesktop() {
     if (socket) {
       socketService.clientFetchUser((user) => setUser(user));
       socketService.clientFetchOnlines((users) => setListOnlines(users));
-      socketService.clientFetchConversations((conversations) => {
-        conversations.forEach((con) => {
+      socketService.clientFetchConversations((cons) => {
+        cons.forEach((con) => {
           socketService.clientJoinRoom(con._id);
         });
-        setConversations(conversations);
+        setConversations(cons);
+      });
+      socketService.onReceiveAllAvailableConversations((cons) => {
+        // filter conversations that include current user
+        const newCons = cons.filter((con) => con.members.some((mem) => mem._id === user._id));
+
+        newCons.forEach((con) => {
+          socketService.clientJoinRoom(con._id);
+        });
+        setConversations(newCons);
       });
       socketService.onReceiveCurrentConversation((conversation) => {
         setIsJoining(false);

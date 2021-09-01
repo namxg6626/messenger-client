@@ -133,6 +133,14 @@ export class SocketService {
   };
 
   /**
+   *
+   * @param {(conversations?: Conversation[]) => any} callback
+   */
+  onReceiveAllAvailableConversations = (callback) => {
+    this.socket.on(SocketEventEnum.SV_SEND_CONVERSATIONS, callback);
+  };
+
+  /**
    * handle message that you've just sent to the room
    * @param {(data: {
    *  conversation: Conversation;
