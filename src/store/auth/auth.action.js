@@ -1,7 +1,5 @@
 import AuthHttp from '@http/auth.http';
 
-const authHttp = new AuthHttp();
-
 const AuthActionsEnum = {
   LOADING: 'auth/LOADING',
   STOP_LOADING: 'auth/STOP_LOADING',
@@ -48,6 +46,7 @@ export const authLoginAsyncAction =
   (username, password, remember = false) =>
   async (dispatch) => {
     dispatch(authLoadingAction());
+    const authHttp = new AuthHttp();
 
     authHttp
       .login(username, password)

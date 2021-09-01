@@ -13,5 +13,5 @@
       "@http/*": ["./src/http/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "craco.config.js"]
 }
