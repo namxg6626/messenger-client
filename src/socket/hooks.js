@@ -32,8 +32,6 @@ export const useAuthenticatedSocket = () => {
       });
 
       socket.on(SocketEventEnum.ERROR, (e) => console.log(`e`, e));
-
-      console.log(`socket`, socket);
     }
   }, [socket]);
 

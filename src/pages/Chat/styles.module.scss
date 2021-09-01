@@ -23,13 +23,6 @@
   margin: 0 !important;
 }
 
-.header {
-  height: 80px;
-
-  background-color: $white !important;
-  border-bottom: 1px solid $grayLighter !important;
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -44,13 +37,4 @@
   padding-top: 1rem;
 
   background-color: $white;
-}
-
-.resetLineHeight {
-  line-height: 0;
-}
-
-.chatName {
-  font-weight: 500;
-  margin-bottom: 1.5rem !important;
 }

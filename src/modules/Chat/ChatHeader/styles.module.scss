@@ -1,0 +1,17 @@
+@import '/src/assets/variables/main';
+
+.header {
+  height: 80px;
+
+  background-color: $white !important;
+  border-bottom: 1px solid $grayLighter !important;
+}
+
+.resetLineHeight {
+  line-height: 0;
+}
+
+.chatName {
+  font-weight: 500;
+  margin-bottom: 1.5rem !important;
+}

@@ -1,37 +1,33 @@
-import { useRef, useEffect, useContext, useState, useMemo, useCallback } from 'react';
+import { useRef, useEffect, useContext, useState, useMemo, useCallback, memo } from 'react';
 import SocketContext from '@socket/SocketReactContext';
 import { useParams } from 'react-router-dom';
-import { Divider, Row, Col, Button, Layout, Avatar, Typography, Tooltip } from 'antd';
+
+import { Divider, Row, Col, Button, Layout, Avatar, Typography } from 'antd';
+
 import { SendOutlined } from '@ant-design/icons';
+
 import { BaseInput } from '@components/index';
-
-import { generateRandomColor } from 'src/utils';
-import styles from './styles.module.scss';
-
-import { useForm } from 'react-hook-form';
-import { MessagesList } from '@modules/Chat';
+import { MessagesList, ChatHeader } from '@modules/Chat';
 
 import _ from 'lodash';
+import { useForm } from 'react-hook-form';
+import { generateRandomColor } from 'src/utils';
+import MessageHttp from '@http/message.http';
 
 import '@models/index';
+import styles from './styles.module.scss';
 
-const { Header } = Layout;
-const { Paragraph, Text } = Typography;
-
-export default function Chat() {
+const Chat = () => {
   const params = useParams();
   const messageEndRef = useRef(null);
+  const messageHttp = useMemo(() => new MessageHttp(), []);
   const { socketService } = useContext(SocketContext);
 
   /** @type {[Message[], (messages: Messages[]) => any]} */
   const [messages, setMessages] = useState([]);
 
   const [isSending, setIsSending] = useState(false);
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: {
-      message: '',
-    },
-  });
+  const { register, handleSubmit, reset } = useForm();
 
   // -handler
 
@@ -59,7 +55,6 @@ export default function Chat() {
   const handleReceiveOwnMessage = useCallback(({ conversation, fromUser, message }) => {
     setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
     setIsSending(false);
-    scrollToBottom();
   }, []);
 
   useEffect(() => {
@@ -72,6 +67,12 @@ export default function Chat() {
       socketService.destroyListener(handleReceiveOwnMessage);
     };
   }, [handleReceiveMessage, handleReceiveOwnMessage, socketService]);
+
+  useEffect(() => {
+    // messageHttp
+    //   .getMessageByConversationId(params.conversationId, 0)
+    //   .then((data) => console.log(`data`, data));
+  }, [messageHttp, params.conversationId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -87,19 +88,7 @@ export default function Chat() {
   return (
     <form autoComplete='off' onSubmit={handleSubmit(handleFormSubmit)}>
       <div className={styles.thisScreen}>
-        <Header className={styles.header}>
-          <Row justify='start' align='middle' gutter={16} style={{ height: '100%' }}>
-            <Col>
-              <Avatar style={{ backgroundColor: generateRandomColor() }} size='large'>
-                K
-              </Avatar>
-            </Col>
-            <Col flex={{ grow: 1 }} className={styles.resetLineHeight}>
-              <Paragraph className={styles.chatName}>Demo Chat Name</Paragraph>
-              <Text>35 members</Text>
-            </Col>
-          </Row>
-        </Header>
+        <ChatHeader avatarString={'K'} chatTitle={'Demo'} numberOfMembers={2} />
         <div className={styles.listOfMessages} key='list-of-messages' aria-label='list-of-messages'>
           <MessagesList messages={messages} />
           <div key='dummy-div-to-scroll' ref={messageEndRef} />
@@ -128,4 +117,10 @@ export default function Chat() {
       </div>
     </form>
   );
-}
+};
+
+export default memo(Chat, () => true);
+
+Chat.whyDidYouRender = {
+  trackAllPureComponents: true,
+};
