@@ -40,6 +40,8 @@ const Chat = (props) => {
   const user = useMemo(() => socketService.getUser(), [socketService]);
 
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [shouldScrollToMiddle, setShouldScrollToMiddle] = useState(false);
+  const [shouldScrollFirstTime, setShouldScrollFirstTime] = useState(true);
   const [page, setPage] = useState(1);
 
   const messageHttp = useMemo(() => new MessageHttp(), []);
@@ -47,12 +49,18 @@ const Chat = (props) => {
   /**
    * @type {{ data: Message[] }}
    */
-  const { data: messages } = useQuery(
+  const { data: messages, isFetching: isQueryFetching } = useQuery(
     MESSAGES_QUERY_KEY,
     () => messageHttp.getMessageByConversationId(params.conversationId, 1),
     {
       placeholderData: [],
       refetchOnWindowFocus: false,
+      onSuccess: () => {
+        if (shouldScrollFirstTime) {
+          setShouldScrollToBottom(() => true);
+          setShouldScrollFirstTime(() => false);
+        }
+      },
     },
   );
   const mutation = useMutation(
@@ -70,7 +78,7 @@ const Chat = (props) => {
 
             return acc;
           }, []);
-          scrollToMiddle();
+          setShouldScrollToMiddle(true);
 
           return removedDuplicateMessages;
         });
@@ -100,16 +108,14 @@ const Chat = (props) => {
 
   const scrollToMiddle = () => {
     if (listRef.current) {
-      listRef.current.scrollTo(null, 100);
+      listRef.current.scrollTo(null, 250);
     }
   };
 
   const handleFormSubmit = ({ message }) => {
     socketService.clientSendMessage(params.conversationId, user._id, message);
     setIsSending(true);
-    reset({
-      message: '',
-    });
+    reset({ message: '' });
     setShouldScrollToBottom(true);
   };
 
@@ -144,10 +150,20 @@ const Chat = (props) => {
     }
   };
 
+  const _renderLoading = () => (
+    <Row justify='center'>
+      <Col>
+        <LoadingOutlined style={{ fontSize: 36 }} spin />
+      </Col>
+    </Row>
+  );
+
   useEffect(() => {
-    const currentPage = Math.ceil(messages.length / PAGE_LIMIT);
-    setPage(currentPage);
-  }, [messages.length]);
+    if (typeof messages?.length === 'number') {
+      const currentPage = Math.ceil(messages.length / PAGE_LIMIT);
+      setPage(currentPage || 1);
+    }
+  }, [messages?.length]);
 
   useEffect(() => {
     socketService.onReceiveJustSentMessage(handleReceiveOwnMessage);
@@ -172,9 +188,16 @@ const Chat = (props) => {
   useLayoutEffect(() => {
     if (shouldScrollToBottom) {
       scrollToBottom();
-      setShouldScrollToBottom(false);
+      _.debounce(() => setShouldScrollToBottom(false), 100);
     }
   }, [shouldScrollToBottom, messages]);
+
+  useLayoutEffect(() => {
+    if (shouldScrollToMiddle) {
+      scrollToMiddle();
+      _.debounce(() => setShouldScrollToMiddle(false), 100);
+    }
+  }, [shouldScrollToMiddle, messages]);
 
   return (
     <form autoComplete='off' onSubmit={handleSubmit(handleFormSubmit)}>
@@ -190,13 +213,8 @@ const Chat = (props) => {
           className={styles.listOfMessages}
           key='list-of-messages'
           aria-label='list-of-messages'>
-          {mutation.isLoading && (
-            <Row justify='center'>
-              <Col>
-                <LoadingOutlined style={{ fontSize: 36 }} spin />
-              </Col>
-            </Row>
-          )}
+          {mutation.isLoading && _renderLoading()}
+          {isQueryFetching && _renderLoading()}
           <MessagesList messages={messages} />
           <div aria-label='dummy-bottom' key='dummy-bottom' ref={messageEndRef} />
         </div>

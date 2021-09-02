@@ -18,7 +18,7 @@ export default class MessageHttp {
             page,
           },
         })
-        .then((res) => resl(res.data.result))
+        .then((res) => resl(res.data.result || []))
         .catch((e) => rej(e.response.data.message));
     });
 }
