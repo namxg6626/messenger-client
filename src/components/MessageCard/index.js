@@ -1,12 +1,10 @@
 import { memo } from 'react';
-import { Row, Col, Avatar, Typography } from 'antd';
+import { Row, Col, Typography } from 'antd';
 import { AppAvatar } from '@components/index';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
-
-import equal from 'deep-equal';
 
 const { Paragraph } = Typography;
 

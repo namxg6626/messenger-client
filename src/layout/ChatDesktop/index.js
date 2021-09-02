@@ -3,9 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Layout, Row, Col, Divider, Dropdown, Menu, Modal, Tabs, Typography, Button } from 'antd';
 import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import * as __mock__ from 'src/__mock__';
 
 import styles from './styles.module.scss';
 import { authLogoutAction } from '@store/auth/auth.action';
@@ -47,7 +46,6 @@ export function ChatDesktop() {
   const [conversations, setConversations] = useState([]);
 
   const [selectedChat, setSelectedChat] = useState('');
-  const [isJoining, setIsJoining] = useState(false);
 
   // functionalities
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -83,7 +81,6 @@ export function ChatDesktop() {
   };
 
   const handleContactClick = (contactId) => {
-    setIsJoining(true);
     socketService.clientCreatePrivateConversation(`private ${user._id} - ${contactId}`, contactId);
   };
 
@@ -108,8 +105,6 @@ export function ChatDesktop() {
         setConversations(newCons);
       });
       socketService.onReceiveCurrentConversation((conversation) => {
-        setIsJoining(false);
-        console.log(`conversation`, conversation);
         navigate('/messages/' + conversation._id, { state: conversation });
       });
     }

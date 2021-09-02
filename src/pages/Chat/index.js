@@ -11,7 +11,7 @@ import {
 import SocketContext from '@socket/SocketReactContext';
 import { useParams, useLocation } from 'react-router-dom';
 
-import { Divider, Row, Col, Button, Skeleton } from 'antd';
+import { Divider, Row, Col, Button } from 'antd';
 
 import { LoadingOutlined, SendOutlined } from '@ant-design/icons';
 
@@ -70,8 +70,6 @@ const Chat = (props) => {
 
             return acc;
           }, []);
-
-          console.log(`removedDuplicateMessages.length`, removedDuplicateMessages.length);
           scrollToMiddle();
 
           return removedDuplicateMessages;
@@ -173,7 +171,6 @@ const Chat = (props) => {
 
   useLayoutEffect(() => {
     if (shouldScrollToBottom) {
-      console.log(`shouldScrollToBottom`, shouldScrollToBottom);
       scrollToBottom();
       setShouldScrollToBottom(false);
     }
@@ -200,7 +197,7 @@ const Chat = (props) => {
               </Col>
             </Row>
           )}
-          <MessagesList onReachTop={() => console.log('hi')} messages={messages} />
+          <MessagesList messages={messages} />
           <div aria-label='dummy-bottom' key='dummy-bottom' ref={messageEndRef} />
         </div>
         <div className={styles.chatInputWrapper} key='chat-input' aria-label='chat-input'>
