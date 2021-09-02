@@ -5,6 +5,7 @@ import { Header } from 'antd/lib/layout/layout';
 import Avatar from 'antd/lib/avatar/avatar';
 import { memo } from 'react';
 import { shallowEqual } from 'react-redux';
+import { getShortName } from '@utils/getters';
 
 const { Paragraph, Text } = Typography;
 
@@ -27,11 +28,13 @@ export const UnmemoizedChatHeader = ({
       <Row justify='start' align='middle' gutter={16} style={{ height: '100%' }}>
         <Col>
           <Avatar style={{ backgroundColor: generateRandomColor() }} size='large'>
-            {avatarString}
+            {getShortName(avatarString)}
           </Avatar>
         </Col>
         <Col flex={{ grow: 1 }} className={styles.resetLineHeight}>
-          <Paragraph className={styles.chatName}>{chatTitle}</Paragraph>
+          <Paragraph ellipsis className={styles.chatName}>
+            {chatTitle}
+          </Paragraph>
           <Text>{numberOfMembers} members</Text>
         </Col>
       </Row>

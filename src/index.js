@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { Alert } from 'antd';
 
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import store, { persistor } from './store';
 
-import reportWebVitals from './reportWebVitals';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
-const { ErrorBoundary } = Alert;
+import reportWebVitals from './reportWebVitals';
+const queryClient = new QueryClient();
 
 ReactDOM.render(
   <React.StrictMode>
-    <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
       <PersistGate persistor={persistor}>
         <Provider store={store}>
           <Router>
@@ -24,7 +24,7 @@ ReactDOM.render(
           </Router>
         </Provider>
       </PersistGate>
-    </ErrorBoundary>
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

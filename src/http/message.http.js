@@ -6,7 +6,7 @@ export default class MessageHttp {
   /**
    *
    * @param {string} conversationId
-   * @param {string} page
+   * @param {number} page
    * @returns {Promise<Message[]>}
    */
   getMessageByConversationId = (conversationId, page) =>

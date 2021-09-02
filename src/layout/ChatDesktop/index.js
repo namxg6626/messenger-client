@@ -20,6 +20,7 @@ import {
 import { useAuthenticatedSocket } from '@socket/hooks';
 
 import { v4 } from 'uuid';
+import { getConversationName } from '@utils/getters';
 
 const { TabPane } = Tabs;
 const TAB_KEYS = {
@@ -72,9 +73,13 @@ export function ChatDesktop() {
     navigate('/messages');
   };
 
-  const handleChatCardClick = (idChat) => {
-    setSelectedChat(idChat);
-    navigate('/messages/' + idChat);
+  /**
+   *
+   * @param {Conversation} conversation
+   */
+  const handleChatCardClick = (conversation) => {
+    setSelectedChat(conversation._id);
+    navigate('/messages/' + conversation._id, { state: conversation });
   };
 
   const handleContactClick = (contactId) => {
@@ -104,14 +109,15 @@ export function ChatDesktop() {
       });
       socketService.onReceiveCurrentConversation((conversation) => {
         setIsJoining(false);
-        navigate('/messages/' + conversation._id);
+        console.log(`conversation`, conversation);
+        navigate('/messages/' + conversation._id, { state: conversation });
       });
     }
 
     return () => {
       socketService.destroyAllListeners();
     };
-  }, [isConnected, navigate, socket, socketService]);
+  }, [isConnected, navigate, socket, socketService, user._id]);
 
   useEffect(() => {
     if (!tabPaneHeight && headerRef.current) {
@@ -157,10 +163,7 @@ export function ChatDesktop() {
 
     return conversations.map((conversation) => {
       const isSelected = conversation._id === selectedChat;
-      const conversationName =
-        conversation.typeConversation === 'private'
-          ? conversation.members.find((m) => m._id !== user._id).displayname
-          : conversation.title;
+      const conversationName = getConversationName(conversation, user._id);
 
       return (
         <ChatCard
@@ -169,7 +172,7 @@ export function ChatDesktop() {
           from={conversationName}
           avatar={conversation.avatar}
           lastMessage={conversation?.newMessage?.content}
-          onClick={() => handleChatCardClick(conversation._id)}
+          onClick={() => handleChatCardClick(conversation)}
         />
       );
     });
@@ -193,10 +196,6 @@ export function ChatDesktop() {
           </Col>
         </Row>
       ));
-  };
-
-  const _renderJoining = () => {
-    return 'loading...';
   };
 
   const menu = (
@@ -282,7 +281,9 @@ export function ChatDesktop() {
         {/* <Row gutter={16}>{_renderConversations()}</Row> */}
       </StyledSider>
       <Divider className={styles.dividerVertical} type='vertical' />
-      <Layout>{isJoining ? _renderJoining() : <Outlet />}</Layout>
+      <Layout>
+        <Outlet />
+      </Layout>
     </Layout>
   );
 }

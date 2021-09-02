@@ -1,29 +1,93 @@
-import { useRef, useEffect, useContext, useState, useMemo, useCallback, memo } from 'react';
+import {
+  useRef,
+  useEffect,
+  useContext,
+  useState,
+  useMemo,
+  useCallback,
+  useLayoutEffect,
+  memo,
+} from 'react';
 import SocketContext from '@socket/SocketReactContext';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
-import { Divider, Row, Col, Button } from 'antd';
+import { Divider, Row, Col, Button, Skeleton } from 'antd';
 
-import { SendOutlined } from '@ant-design/icons';
+import { LoadingOutlined, SendOutlined } from '@ant-design/icons';
 
 import { BaseInput } from '@components/index';
 import { MessagesList, ChatHeader } from '@modules/Chat';
 
+import MessageHttp from '@http/message.http';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
-import MessageHttp from '@http/message.http';
-
 import '@models/index';
 import styles from './styles.module.scss';
+import { getConversationName } from '@utils/getters';
 
-const Chat = () => {
+const MESSAGES_QUERY_KEY = 'messages';
+const PAGE_LIMIT = 20;
+
+const Chat = (props) => {
   const params = useParams();
+  const location = useLocation();
+
   const messageEndRef = useRef(null);
-  const messageHttp = useMemo(() => new MessageHttp(), []);
+  const listRef = useRef(null);
   const { socketService } = useContext(SocketContext);
+  const user = useMemo(() => socketService.getUser(), [socketService]);
+
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [page, setPage] = useState(1);
+
+  const messageHttp = useMemo(() => new MessageHttp(), []);
+  const client = useQueryClient();
+  /**
+   * @type {{ data: Message[] }}
+   */
+  const { data: messages } = useQuery(
+    MESSAGES_QUERY_KEY,
+    () => messageHttp.getMessageByConversationId(params.conversationId, 1),
+    {
+      placeholderData: [],
+      refetchOnWindowFocus: false,
+    },
+  );
+  const mutation = useMutation(
+    ({ conversationId = '', page = 1 }) => {
+      return messageHttp.getMessageByConversationId(conversationId, page);
+    },
+    {
+      onSuccess: (data) => {
+        client.setQueryData(MESSAGES_QUERY_KEY, (old) => {
+          const newMessages = data.concat(old);
+          const removedDuplicateMessages = newMessages.reduce((acc, curr) => {
+            if (!acc.some((v) => v._id === curr._id)) {
+              acc.push(curr);
+            }
+
+            return acc;
+          }, []);
+
+          console.log(`removedDuplicateMessages.length`, removedDuplicateMessages.length);
+          scrollToMiddle();
+
+          return removedDuplicateMessages;
+        });
+        setPage((p) => p + 1);
+      },
+    },
+  );
+
+  /**
+   * @type {Conversation}
+   */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const matchedConversation = useMemo(() => location.state, [location.state._id]);
 
   /** @type {[Message[], (messages: Messages[]) => any]} */
-  const [messages, setMessages] = useState([]);
 
   const [isSending, setIsSending] = useState(false);
   const { register, handleSubmit, reset } = useForm();
@@ -36,25 +100,56 @@ const Chat = () => {
     }
   };
 
+  const scrollToMiddle = () => {
+    if (listRef.current) {
+      listRef.current.scrollTo(null, 100);
+    }
+  };
+
   const handleFormSubmit = ({ message }) => {
-    const user = socketService.getUser();
     socketService.clientSendMessage(params.conversationId, user._id, message);
     setIsSending(true);
     reset({
       message: '',
     });
+    setShouldScrollToBottom(true);
   };
 
   // -useEffect
 
-  const handleReceiveMessage = useCallback(({ conversation, fromUser, message }) => {
-    setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
-  }, []);
+  const handleReceiveMessage = useCallback(
+    ({ conversation, fromUser, message }) => {
+      client.setQueryData(MESSAGES_QUERY_KEY, (old) =>
+        _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+      );
+      setIsSending(false);
+    },
+    [client],
+  );
 
-  const handleReceiveOwnMessage = useCallback(({ conversation, fromUser, message }) => {
-    setMessages((curr) => [...curr, _.omit(message, 'createdAt', 'updatedAt')]);
-    setIsSending(false);
-  }, []);
+  const handleReceiveOwnMessage = useCallback(
+    ({ conversation, fromUser, message }) => {
+      client.setQueryData(MESSAGES_QUERY_KEY, (old) =>
+        _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+      );
+      setIsSending(false);
+    },
+    [client],
+  );
+
+  const handleReachTop = (e) => {
+    if (e?.target?.parentElement?.scrollTop === 0 && !mutation.isLoading) {
+      mutation.mutate({
+        conversationId: params.conversationId,
+        page: page + 1,
+      });
+    }
+  };
+
+  useEffect(() => {
+    const currentPage = Math.ceil(messages.length / PAGE_LIMIT);
+    setPage(currentPage);
+  }, [messages.length]);
 
   useEffect(() => {
     socketService.onReceiveJustSentMessage(handleReceiveOwnMessage);
@@ -68,29 +163,45 @@ const Chat = () => {
   }, [handleReceiveMessage, handleReceiveOwnMessage, socketService]);
 
   useEffect(() => {
-    // messageHttp
-    //   .getMessageByConversationId(params.conversationId, 0)
-    //   .then((data) => console.log(`data`, data));
-  }, [messageHttp, params.conversationId]);
-
-  useEffect(() => {
-    scrollToBottom();
-
     const handleResize = () => {
-      scrollToBottom();
+      setShouldScrollToBottom(true);
     };
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useLayoutEffect(() => {
+    if (shouldScrollToBottom) {
+      console.log(`shouldScrollToBottom`, shouldScrollToBottom);
+      scrollToBottom();
+      setShouldScrollToBottom(false);
+    }
+  }, [shouldScrollToBottom, messages]);
+
   return (
     <form autoComplete='off' onSubmit={handleSubmit(handleFormSubmit)}>
       <div className={styles.thisScreen}>
-        <ChatHeader avatarString={'K'} chatTitle={'Demo'} numberOfMembers={2} />
-        <div className={styles.listOfMessages} key='list-of-messages' aria-label='list-of-messages'>
-          <MessagesList messages={messages} />
-          <div key='dummy-div-to-scroll' ref={messageEndRef} />
+        <ChatHeader
+          avatarString={getConversationName(matchedConversation, user._id)}
+          chatTitle={getConversationName(matchedConversation, user._id)}
+          numberOfMembers={matchedConversation.members.length}
+        />
+        <div
+          ref={listRef}
+          onWheelCapture={handleReachTop}
+          className={styles.listOfMessages}
+          key='list-of-messages'
+          aria-label='list-of-messages'>
+          {mutation.isLoading && (
+            <Row justify='center'>
+              <Col>
+                <LoadingOutlined style={{ fontSize: 36 }} spin />
+              </Col>
+            </Row>
+          )}
+          <MessagesList onReachTop={() => console.log('hi')} messages={messages} />
+          <div aria-label='dummy-bottom' key='dummy-bottom' ref={messageEndRef} />
         </div>
         <div className={styles.chatInputWrapper} key='chat-input' aria-label='chat-input'>
           <Divider className={styles.divider} />

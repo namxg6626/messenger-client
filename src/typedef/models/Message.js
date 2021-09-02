@@ -13,4 +13,6 @@
  *      fileName: string;
  * }} payload
  * @property {boolean} isOnline
+ * @property {string} updatedAt
+ * @property {string} createdAt
  */

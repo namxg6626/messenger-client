@@ -8,10 +8,12 @@
 }
 
 .resetLineHeight {
-  line-height: 0;
+  line-height: 2rem;
+  //   margin: 0 !important;
 }
 
 .chatName {
   font-weight: 500;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 0 !important;
+  max-width: 200px;
 }
