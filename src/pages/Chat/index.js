@@ -46,11 +46,15 @@ const Chat = (props) => {
 
   const messageHttp = useMemo(() => new MessageHttp(), []);
   const client = useQueryClient();
+  const QUERY_KEY = useMemo(
+    () => [MESSAGES_QUERY_KEY, { conversationId: params.conversationId }],
+    [params.conversationId],
+  );
   /**
    * @type {{ data: Message[] }}
    */
   const { data: messages, isFetching: isQueryFetching } = useQuery(
-    MESSAGES_QUERY_KEY,
+    QUERY_KEY,
     () => messageHttp.getMessageByConversationId(params.conversationId, 1),
     {
       placeholderData: [],
@@ -69,17 +73,10 @@ const Chat = (props) => {
     },
     {
       onSuccess: (data) => {
-        client.setQueryData(MESSAGES_QUERY_KEY, (old) => {
+        client.setQueryData(QUERY_KEY, (old) => {
           const newMessages = data.concat(old);
-          const removedDuplicateMessages = newMessages.reduce((acc, curr) => {
-            if (!acc.some((v) => v._id === curr._id)) {
-              acc.push(curr);
-            }
-
-            return acc;
-          }, []);
+          const removedDuplicateMessages = _.uniqBy(newMessages, (m) => m._id);
           setShouldScrollToMiddle(true);
-
           return removedDuplicateMessages;
         });
         setPage((p) => p + 1);
@@ -123,22 +120,22 @@ const Chat = (props) => {
 
   const handleReceiveMessage = useCallback(
     ({ conversation, fromUser, message }) => {
-      client.setQueryData(MESSAGES_QUERY_KEY, (old) =>
+      client.setQueryData(QUERY_KEY, (old) =>
         _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
       );
       setIsSending(false);
     },
-    [client],
+    [QUERY_KEY, client],
   );
 
   const handleReceiveOwnMessage = useCallback(
     ({ conversation, fromUser, message }) => {
-      client.setQueryData(MESSAGES_QUERY_KEY, (old) =>
+      client.setQueryData(QUERY_KEY, (old) =>
         _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
       );
       setIsSending(false);
     },
-    [client],
+    [QUERY_KEY, client],
   );
 
   const handleReachTop = (e) => {
@@ -167,14 +164,13 @@ const Chat = (props) => {
 
   useEffect(() => {
     socketService.onReceiveJustSentMessage(handleReceiveOwnMessage);
-
-    socketService.onReceiveOthersMessage(handleReceiveMessage);
+    socketService.onReceiveOthersMessage(handleReceiveMessage, params.conversationId);
 
     return () => {
       socketService.destroyListener(handleReceiveMessage);
       socketService.destroyListener(handleReceiveOwnMessage);
     };
-  }, [handleReceiveMessage, handleReceiveOwnMessage, socketService]);
+  }, [handleReceiveMessage, handleReceiveOwnMessage, params.conversationId, socketService]);
 
   useEffect(() => {
     const handleResize = () => {

@@ -153,13 +153,21 @@ export class SocketService {
   };
 
   /**
-   *
    * @param {({ fromUser: User, conversation: Conversation, message: Message }) => any} callback
+   * @param {string?} filterByConversationId
+   * fires the callback if this param equals **message's conversationId**
+   * - falsy value means disable this feature
    */
-  onReceiveOthersMessage = (callback) => {
+  onReceiveOthersMessage = (callback, filterByConversationId = null) => {
     this.socket.on(SocketEventEnum.SV_SEND_MESSAGE, (data) => {
       console.log(`data`, data);
-      callback(data);
+      if (filterByConversationId && data.conversation._id === filterByConversationId) {
+        callback(data);
+      }
+
+      if (!filterByConversationId) {
+        callback(data);
+      }
     });
   };
 
