@@ -43,10 +43,6 @@ const MemoizedMessageCard = ({ avatar = '', message = '', me = false, ...props }
 
 export const MessageCard = memo(MemoizedMessageCard);
 
-MessageCard.whyDidYouRender = {
-  trackAllPureComponents: true,
-};
-
 MemoizedMessageCard.propTypes = {
   avatar: PropTypes.string,
   message: PropTypes.string,

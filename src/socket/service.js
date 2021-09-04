@@ -2,6 +2,7 @@ import io from 'socket.io-client';
 import { TypeConversation } from './constants';
 import { SocketEventEnum } from './events';
 import '@models/index';
+import _ from 'lodash';
 
 export class SocketService {
   /**
@@ -73,12 +74,12 @@ export class SocketService {
    * @param {Array<string>} members list of members will be added
    */
   clientCreateGroupConversation = (title, members) => {
-    this.socket.emit({
+    this.socket.emit(SocketEventEnum.CLIENT_CREATE_CONVERSATION, {
       typeConversation: TypeConversation.GROUP,
       title,
       from: this.user._id,
       to: null,
-      members,
+      members: _.uniq([...members, this.user._id]),
     });
   };
 

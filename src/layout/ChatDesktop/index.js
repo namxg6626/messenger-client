@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 
-import { Layout, Row, Col, Divider, Dropdown, Menu, Modal, Tabs, Typography, Button } from 'antd';
+import {
+  Layout,
+  Row,
+  Col,
+  Divider,
+  Dropdown,
+  Menu,
+  Modal,
+  Tabs,
+  Typography,
+  Button,
+  Empty,
+  Checkbox,
+  Input,
+  Form,
+} from 'antd';
 import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
 import { Outlet, useNavigate } from 'react-router-dom';
@@ -46,9 +61,12 @@ export function ChatDesktop() {
   const [conversations, setConversations] = useState([]);
 
   const [selectedChat, setSelectedChat] = useState('');
+  const [isCreatingGroupChat, setIsCreatingGroupChat] = useState(false);
+  const [form] = Form.useForm();
 
   // functionalities
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isCreateGroupChatModalOpen, setIsCreateGroupChatModalOpen] = useState(false);
   const [tabPaneHeight, setTabPaneHeight] = useState(0);
   const [tabKey, setTabKey] = useState(TAB_KEYS.CONVERSATIONS);
 
@@ -65,6 +83,19 @@ export function ChatDesktop() {
 
   const handleLogoutModalCancel = () => {
     setIsLogoutModalOpen(false);
+  };
+
+  const handleCreateGroupFormFinished = (v) => {
+    setIsCreatingGroupChat(true);
+    socketService.clientCreateGroupConversation(v.title, v.members);
+  };
+
+  const handleCreateGroupChatOk = () => {
+    form.submit();
+  };
+
+  const handleCreateGroupChatCancel = () => {
+    setIsCreateGroupChatModalOpen(false);
   };
 
   const handleHomeClick = () => {
@@ -106,6 +137,8 @@ export function ChatDesktop() {
       });
       socketService.onReceiveCurrentConversation((conversation) => {
         navigate('/messages/' + conversation._id, { state: conversation });
+        setIsCreatingGroupChat(false);
+        setIsCreateGroupChatModalOpen(false);
       });
     }
 
@@ -173,8 +206,56 @@ export function ChatDesktop() {
     });
   };
 
+  const _renderEmptyContacts = () => (
+    <Empty
+      image='https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'
+      description={<Typography.Text type='secondary'>Không có ai hoạt động :(</Typography.Text>}
+    />
+  );
+
+  const _renderChoosingMember = () => {
+    const listOnlinesExcludeMe = listOnlines.filter((online) => online._id !== data.userId);
+
+    if (!listOnlinesExcludeMe.length) {
+      return _renderEmptyContacts();
+    }
+
+    return (
+      <Form form={form} onFinish={handleCreateGroupFormFinished}>
+        <Form.Item
+          name='title'
+          label='Tên cuộc trò chuyện'
+          rules={[{ required: true, message: 'Bạn chưa nhập tên cuộc trò chuyện' }]}>
+          <Input placeholder='Tên cuộc trò chuyện' />
+        </Form.Item>
+        <Form.Item name='members' label='Danh sách thành viên'>
+          <Checkbox.Group
+            options={listOnlinesExcludeMe.map((o) => ({
+              label: o.displayname,
+              value: o._id,
+            }))}
+          />
+        </Form.Item>
+      </Form>
+    );
+  };
+
   const _renderContacts = () => {
-    return listOnlines
+    const listOnlinesExcludeMe = listOnlines.filter((online) => online._id !== data.userId);
+
+    if (!listOnlinesExcludeMe.length) {
+      return (
+        <Row
+          align='middle'
+          justify='center'
+          style={{ height: `calc(100vh - ${tabPaneHeight}px)` }}
+          className={styles.emptyConversationPane}>
+          <Col>{_renderEmptyContacts()}</Col>
+        </Row>
+      );
+    }
+
+    return listOnlinesExcludeMe
       .filter((online) => online._id !== data.userId)
       .map((online) => (
         <Row
@@ -221,6 +302,18 @@ export function ChatDesktop() {
           Bạn muốn đăng xuất khỏi tài khoản <b>{data.displayname}</b>?
         </p>
       </Modal>
+      <Modal
+        title={
+          <div>
+            <ExclamationCircleOutlined /> Tạo nhóm chat
+          </div>
+        }
+        visible={isCreateGroupChatModalOpen}
+        confirmLoading={isCreatingGroupChat}
+        onOk={handleCreateGroupChatOk}
+        onCancel={handleCreateGroupChatCancel}>
+        {_renderChoosingMember()}
+      </Modal>
       <StyledSider ref={headerRef} className={styles.siderScroll}>
         <div className={styles.siderHead}>
           <Row gutter={16} align='middle' className={styles.avatarSection}>
@@ -260,6 +353,13 @@ export function ChatDesktop() {
               </span>
             }
             key={TAB_KEYS.CONVERSATIONS}>
+            <Row justify='space-between'>
+              <Col>
+                <Button type='default' onClick={() => setIsCreateGroupChatModalOpen(true)}>
+                  Tạo cuộc trò chuyện nhóm
+                </Button>
+              </Col>
+            </Row>
             {_renderConversations()}
           </TabPane>
           <TabPane

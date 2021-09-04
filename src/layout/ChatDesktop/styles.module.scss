@@ -84,7 +84,7 @@
 
 .emptyConversationPane {
   padding-bottom: 1rem;
-  transform: translateY(-2rem);
+  // transform: translateY(-2rem);
 }
 
 .emptyConversationRow {
@@ -95,4 +95,9 @@
 .emptyConversationIcon {
   font-size: 64px;
   font-weight: 100;
+}
+
+.createGroupChatModal {
+  @include vertical-scrollbar();
+  height: 400px;
 }
