@@ -10,5 +10,6 @@ module.exports = override(
     '@socket': path.resolve(__dirname, 'src/socket'),
     '@models': path.resolve(__dirname, 'src/typedef/models'),
     '@http': path.resolve(__dirname, 'src/http'),
+    '@assets': path.resolve(__dirname, 'src/assets'),
   }),
 );

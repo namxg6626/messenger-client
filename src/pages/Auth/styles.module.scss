@@ -1,11 +1,18 @@
+@import '/src/assets/variables/main';
+
 .thisScreen {
   display: flex;
   height: 100vh;
 
   justify-content: center;
   align-items: center;
+
+  background-image: linear-gradient(to bottom left, $blue, $grayDarker);
 }
 
 .form {
-  transform: translateY(-10rem);
+  padding: 4rem 4rem !important;
+  background-color: $white;
+  box-shadow: $shadows-4;
+  border-radius: 0.5rem;
 }

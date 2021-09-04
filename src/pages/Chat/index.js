@@ -90,8 +90,6 @@ const Chat = (props) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const matchedConversation = useMemo(() => location.state, [location.state._id]);
 
-  /** @type {[Message[], (messages: Messages[]) => any]} */
-
   const [isSending, setIsSending] = useState(false);
   const { register, handleSubmit, reset } = useForm();
 
@@ -139,7 +137,7 @@ const Chat = (props) => {
   );
 
   const handleReachTop = (e) => {
-    if (e?.target?.parentElement?.scrollTop === 0 && !mutation.isLoading) {
+    if (e?.target?.parentElement?.scrollTop === 0 && !mutation.isLoading && messages.length) {
       mutation.mutate({
         conversationId: params.conversationId,
         page: page + 1,

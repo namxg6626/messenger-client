@@ -1,5 +1,7 @@
 import AuthHttp from '@http/auth.http';
 
+const authHttp = new AuthHttp();
+
 const AuthActionsEnum = {
   LOADING: 'auth/LOADING',
   STOP_LOADING: 'auth/STOP_LOADING',
@@ -44,14 +46,27 @@ export const authClearError = () => ({
 
 export const authLoginAsyncAction =
   (username, password, remember = false) =>
-  async (dispatch) => {
+  (dispatch) => {
     dispatch(authLoadingAction());
-    const authHttp = new AuthHttp();
 
     authHttp
       .login(username, password)
       .then((data) => {
         dispatch(authLoginAction(data, remember));
+      })
+      .catch((e) => dispatch(authFailedAction(e)))
+      .finally(() => dispatch(authStopLoadingAction()));
+  };
+
+export const authSignUpAsyncAction =
+  (username, displayname, password, remember = false) =>
+  (dispatch) => {
+    dispatch(authLoadingAction());
+
+    authHttp
+      .signUp(username, displayname, password)
+      .then((data) => {
+        dispatch(authLoginAsyncAction(username, password, remember));
       })
       .catch((e) => dispatch(authFailedAction(e)))
       .finally(() => dispatch(authStopLoadingAction()));
