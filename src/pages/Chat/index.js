@@ -118,8 +118,12 @@ const Chat = (props) => {
 
   const handleReceiveMessage = useCallback(
     ({ conversation, fromUser, message }) => {
+      console.log(`others`, message);
       client.setQueryData(QUERY_KEY, (old) =>
-        _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+        _.uniqBy(
+          _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+          (m) => m._id,
+        ),
       );
       setIsSending(false);
     },
@@ -128,8 +132,13 @@ const Chat = (props) => {
 
   const handleReceiveOwnMessage = useCallback(
     ({ conversation, fromUser, message }) => {
+      console.log(`own`, message);
+
       client.setQueryData(QUERY_KEY, (old) =>
-        _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+        _.uniqBy(
+          _.orderBy(old.concat(message), (m) => m.createdAt, 'asc'),
+          (m) => m._id,
+        ),
       );
       setIsSending(false);
     },

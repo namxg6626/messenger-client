@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import { StyledSider } from './styled';
 import { ChatCard, BaseInput, AppAvatar } from '@components/index';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
@@ -50,6 +50,7 @@ export function ChatDesktop() {
   const { socket, ctxSetSocket, socketService } = useAuthenticatedSocket();
   const isConnected = !!socket?.connected;
   const headerRef = useRef(null);
+  const params = useParams();
 
   /** @type {[User[], (users: User[]) => any]} */
   const [listOnlines, setListOnlines] = useState([]);
@@ -145,7 +146,7 @@ export function ChatDesktop() {
     return () => {
       socketService.destroyAllListeners();
     };
-  }, [isConnected, navigate, socket, socketService, user._id]);
+  }, [isConnected, navigate, socket, socketService, user._id, params.conversationId]);
 
   useEffect(() => {
     if (!tabPaneHeight && headerRef.current) {
